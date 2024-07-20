@@ -1,5 +1,6 @@
 const express=require('express');
 const cors = require('cors');
+const mysql = require("mysql");
 const jwt=require('jsonwebtoken')
 const dotenv=require('dotenv')
 const bodyparser = require('body-parser');
@@ -14,4 +15,4 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: false }));
 
 
-module.exports={app,db,authenticate_token,storage,bcrypt,router,jwt,dotenv};
+module.exports={app,mysql,db,authenticate_token,storage,bcrypt,router,jwt,dotenv};

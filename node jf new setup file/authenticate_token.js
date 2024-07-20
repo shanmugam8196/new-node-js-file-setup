@@ -15,7 +15,7 @@ pack.router.generateAccessToken= (user) =>{
     // const options = { expiresIn: '1h' };
     // return jwt.sign(payload, secret, options);
     pack.storage.set('session_time_out',parseInt(process.env.SESSION_TIME_OUT) + Math.floor(Date.now() / 1000));
-
+    pack.storage.set('user',user);
    return pack.jwt.sign({
       exp: Math.floor(Date.now() / 1000) + (60 * 60),
       id: user.id,
@@ -36,7 +36,6 @@ pack.router.verifyAccessToken=(token)=> {
         return { success: true, data: decoded };
       }else{
         return { success: false, error: 'Token is expired' };
-
       }
       
     } catch (error) {
@@ -52,12 +51,26 @@ pack.router.verifyAccessToken=(token)=> {
     if (!token) {
       return res.sendStatus(401);
     }
-    const result = router.verifyAccessToken(token);
-  
+    const result = pack.router.verifyAccessToken(token);
     if (!result.success) {
       return res.status(403).json({ error: result.error });
     }
   
+    pack.db = pack.mysql.createConnection({
+      host: process.env.HOST_NAME,
+      port: process.env.PORT,
+      user: process.env.user,
+      password: process.env.PASSWORD,
+      database: 'eplus_'+pack.storage.get('user').tenant_id+"_24_25"
+    });
+    
+    pack.db.connect((err) => {
+      if (err) {
+        console.log('Error connecting to the database:', err);
+      }
+      console.log('Connected to the dynamic database');
+    });
+
     req.user = result.data;
     next();
   }
